@@ -49,7 +49,6 @@ void loop_hedgehog()
 
   total_received_in_loop= 0;
   packet_received= 0;
-  
   while(Serial1.available() > 0)
     {
       if (hedgehog_serial_buf_ofs>=HEDGEHOG_BUF_SIZE) 

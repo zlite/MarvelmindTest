@@ -7,6 +7,13 @@
  * Serial data from hedgehog : digital pin 0 (RXD)
  * Serial data to hedgehog : digital pin 1 (TXD)
  * Button "ready to receive path" : digital pin 3. Should be shorted to GND if device is ready to receive
+ * LCD RS pin : digital pin 8
+ * LCD Enable pin : digital pin 9
+ * LCD D4 pin : digital pin 4
+ * LCD D5 pin : digital pin 5
+ * LCD D6 pin : digital pin 6
+ * LCD D7 pin : digital pin 7
+ * LCD BL pin : digital pin 10
  *Vcc pin :  +5
  */
 
@@ -17,6 +24,7 @@
   *   2. After loading of the path if pin 3 is connected to GND, first line of LCD shows the movement path step by step  with 1 sec interval
   */
 
+#include <LiquidCrystal.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -72,6 +80,8 @@ byte moveItemShowIndex= 0;
 //    Marvelmind hedgehog support initialize
 void setup_hedgehog() 
 {int i;
+  Serial1.begin(500000); // hedgehog transmits data on 500 kbps  
+
   hedgehog_serial_buf_ofs= 0;
   hedgehog_pos_updated= 0;
 
@@ -351,18 +361,29 @@ void hedgehog_set_crc16(byte *buf, byte size)
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
+LiquidCrystal lcd(8, 13, 9, 4, 5, 6, 7);
+
 void lcd_show_path_progress(byte indcur, byte ntotal)
 {
+  lcd.setCursor(8,0); 
+  lcd.print("P=");  
   Serial.print("P=");  
+  lcd.print(indcur+1);
   Serial.print(indcur+1);
+  lcd.print('/');
   Serial.print('/');
-  Serial.println(ntotal); 
+  lcd.print(ntotal);
+  Serial.println(ntotal);
+  lcd.print("  "); 
 }
 
 void lcd_show_move_item()
 {
+  lcd.setCursor(0,0); 
+  lcd.print(moveItemShowIndex);
   Serial.print(moveItemShowIndex);
-  Serial.print(':');
+  lcd.print(':');
+  Serial.print(":");
 
   byte moveType= moveItems[moveItemShowIndex].moveType;
   int param1= moveItems[moveItemShowIndex].param1;
@@ -380,7 +401,8 @@ void lcd_show_move_item()
     case 7: c= 'V'; break;
     default: c='?';break;
   }
-  Serial.print(c);
+  lcd.print(c);
+  Serial.println(c);
   switch(moveType)
   {
     case 0:
@@ -390,6 +412,7 @@ void lcd_show_move_item()
     case 4: 
     case 6:
     case 7: {
+      lcd.print(param1);
       Serial.print(param1);
       break;
     }
@@ -397,17 +420,22 @@ void lcd_show_move_item()
   switch(moveType)
   {
     case 6: {
-      Serial.print(',');
+      lcd.print(',');
+      Serial.print(",");
+      lcd.print(param2);
       Serial.println(param2);
       break;
     }
   } 
+  lcd.print("        ");   
 }
 
 void setup()
 {
-  Serial1.begin(500000); // hedgehog transmits data on 500 kbps
-  Serial.begin(9600);  
+  lcd.clear(); 
+  lcd.begin(16, 2);
+  lcd.setCursor(0,0); 
+  Serial.begin(9600);
   setup_hedgehog();//    Marvelmind hedgehog support initialize
 }
 
@@ -415,19 +443,30 @@ void loop()
 {bool showPath;
 
    delayMicroseconds(500);
+   
    loop_hedgehog();// Marvelmind hedgehog service loop
+
    showPath= ((moveItemsNum != 0) && (digitalRead(READY_RECEIVE_PATH_PIN)== LOW));
+
    if (hedgehog_pos_updated)
      {// new data from hedgehog available
        hedgehog_pos_updated= 0;// clear new data flag 
 
        if (!showPath)
          {      
+           lcd.setCursor(0,0); 
+           lcd.print("X=");
            Serial.print("X=");
-           Serial.println(hedgehog_x); 
-           Serial.print("Y=");
-           Serial.println(hedgehog_y);  
-        }
+           lcd.print(hedgehog_x);
+           Serial.println(hedgehog_x);
+           lcd.print("   ");  
+         }
+       lcd.setCursor(0,1);
+       lcd.print("Y=");
+       Serial.print("Y=");
+       lcd.print(hedgehog_y);  
+       Serial.println(hedgehog_y);
+       lcd.print("   ");  
      }
 
   if (showPath)
