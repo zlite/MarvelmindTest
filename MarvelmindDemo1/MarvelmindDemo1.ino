@@ -13,9 +13,10 @@ int hedgehog_pos_updated;// flag of new data from hedgehog received
 double old_x, old_y;
 float speed = 120;
 
+int waypoint_num = 1;
 double waypoint_x = 2;
 double waypoint_y = 3;
-
+double waypoint[3][2] = {{2,3},{1,3},{3,2}};
 
 bool high_resolution_mode;
 
@@ -32,6 +33,7 @@ byte hedgehog_serial_buf_ofs;
 #define POSITION_DATAGRAM_ID 0x0001
 #define POSITION_DATAGRAM_HIGHRES_ID 0x0011
 unsigned int hedgehog_data_id;
+
 
 typedef union {byte b[2]; unsigned int w;int wi;} uni_8x2_16;
 typedef union {byte b[4];float f;unsigned long v32;long vi32;} uni_8x4_32;
