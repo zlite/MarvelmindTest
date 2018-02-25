@@ -10,6 +10,14 @@
 long hedgehog_x, hedgehog_y;// coordinates of hedgehog (X,Y), mm
 long hedgehog_z;// height of hedgehog, mm
 int hedgehog_pos_updated;// flag of new data from hedgehog received
+float slope;
+int heading;
+double delta_x, delta_y, angle;
+float speed = 150;
+float old_x, old_y;
+
+
+
 
 bool high_resolution_mode;
 
@@ -258,8 +266,16 @@ void loop()
        Serial.print("Y = ");
        Serial.println(lcd_buf); 
        
-       dtostrf(((float) hedgehog_z)/1000.0f, 4, lcd_coord_precision, lcd_buf);   
-     }
+       delta_x = hedgehog_x-old_x;
+       delta_y = hedgehog_y - old_y;
+       slope = (hedgehog_y - old_y)/(hedgehog_x-old_x); // slope of movement
+       angle = atan2(delta_y,delta_x);
+       Serial.print ("Angle = ");
+       Serial.println(angle);
+       old_x = hedgehog_x;
+       old_y = hedgehog_y;
+       steer(angle,speed);            
+       }
 }
 
 long Distance(long time, int flag)
