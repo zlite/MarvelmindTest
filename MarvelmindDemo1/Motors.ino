@@ -9,8 +9,8 @@ int IN3=8;
 int IN4=9;
   float speed_left;
   float speed_right;
-  speed_left = speed + (angle*60);
-  speed_right = speed - (angle*60);
+  speed_left = speed - (angle*30);
+  speed_right = speed + (angle*30);
 
   analogWrite(ENA, speed_left);
   analogWrite(ENB, speed_right);

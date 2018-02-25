@@ -10,13 +10,11 @@
 long hedgehog_x, hedgehog_y;// coordinates of hedgehog (X,Y), mm
 long hedgehog_z;// height of hedgehog, mm
 int hedgehog_pos_updated;// flag of new data from hedgehog received
-float slope;
-int heading;
-double delta_x, delta_y, angle;
-float speed = 150;
-float old_x, old_y;
+double old_x, old_y;
+float speed = 120;
 
-
+double waypoint_x = 2;
+double waypoint_y = 3;
 
 
 bool high_resolution_mode;
@@ -259,22 +257,13 @@ void loop()
         }
        
        dtostrf(((float) hedgehog_x)/1000.0f, 4, lcd_coord_precision, lcd_buf);
-       Serial.print("X = ");
-       Serial.println(lcd_buf); 
+//       Serial.print("X = ");
+//       Serial.println(lcd_buf); 
        
        dtostrf(((float) hedgehog_y)/1000.0f, 4, lcd_coord_precision, lcd_buf);
-       Serial.print("Y = ");
-       Serial.println(lcd_buf); 
-       
-       delta_x = hedgehog_x-old_x;
-       delta_y = hedgehog_y - old_y;
-       slope = (hedgehog_y - old_y)/(hedgehog_x-old_x); // slope of movement
-       angle = atan2(delta_y,delta_x);
-       Serial.print ("Angle = ");
-       Serial.println(angle);
-       old_x = hedgehog_x;
-       old_y = hedgehog_y;
-       steer(angle,speed);            
+//       Serial.print("Y = ");
+//       Serial.println(lcd_buf); 
+       navigate(waypoint_x, waypoint_y, hedgehog_x, hedgehog_y);           
        }
 }
 
@@ -283,14 +272,14 @@ long Distance(long time, int flag)
   /*
   
   */
-  long distacne;
+  long distance;
   if(flag)
-    distacne = time /29 / 2  ;     // Distance_CM  = ((Duration of high level)*(Sonic :340m/s))/2
+    distance = time /29 / 2  ;     // Distance_CM  = ((Duration of high level)*(Sonic :340m/s))/2
                                    //              = ((Duration of high level)*(Sonic :0.034 cm/us))/2
                                    //              = ((Duration of high level)/(Sonic :29.4 cm/us))/2
   else
-    distacne = time / 74 / 2;      // INC
-  return distacne;
+    distance = time / 74 / 2;      // INC
+  return distance;
 }
 
 long TP_init()
