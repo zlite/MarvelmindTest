@@ -16,7 +16,7 @@ float speed = 120;
 int waypoint_num = 1;
 double waypoint_x = 2;
 double waypoint_y = 3;
-double waypoint[3][2] = {{2,3},{1,3},{3,2}};
+double waypoint[3][2] = {{2,3},{8,7},{3,2}};
 
 bool high_resolution_mode;
 
@@ -265,7 +265,7 @@ void loop()
        dtostrf(((float) hedgehog_y)/1000.0f, 4, lcd_coord_precision, lcd_buf);
 //       Serial.print("Y = ");
 //       Serial.println(lcd_buf); 
-       navigate(waypoint_x, waypoint_y, hedgehog_x, hedgehog_y);           
+       navigate(hedgehog_x, hedgehog_y, waypoint_num);           
        }
 }
 
